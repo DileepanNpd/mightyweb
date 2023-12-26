@@ -215,6 +215,9 @@ Future<model.MainResponse> fetchData() async {
         await removeKey(MENU_STYLE);
         await removeKey(BOTTOMMENU);
         await removeKey(BOTTOMSIDEMENU);
+        appStore.mBottomNavigationList.clear();
+        appStore.mMenuList.clear();
+
         // await setValue(MENU_STYLE, jsonEncode(mModel.menuStyle));
         mModel.menuStyle.forEachIndexed((element, index) {
           if (mModel.appconfiguration!.navigationStyle == NAVIGATION_STYLE_BOTTOM_NAVIGATION_SIDE_DRAWER) {
@@ -243,6 +246,7 @@ Future<model.MainResponse> fetchData() async {
 
       // Walk Through List
       if (mModel.walkthrough != null) {
+        appStore.mOnBoardList.clear();
         mModel.walkthrough.forEachIndexed((element, index) {
           if (element.status == "1") {
             appStore.addToOnBoardList(element);
@@ -256,6 +260,7 @@ Future<model.MainResponse> fetchData() async {
 
       // FAB List
       if (mModel.floatingButton != null) {
+        appStore.mFABList.clear();
         await removeKey(FLOATING_DATA);
         mModel.floatingButton.forEachIndexed((element, index) {
           if (element.status == "1") {
@@ -271,6 +276,7 @@ Future<model.MainResponse> fetchData() async {
       // Tab List
       if (mModel.tabs != null) {
         await removeKey(TABS);
+        appStore.mTabList.clear();
         mModel.tabs.forEachIndexed((element, index) {
           if (element.status == "1") {
             appStore.addToTabList(element);
@@ -307,6 +313,7 @@ Future<model.MainResponse> fetchData() async {
       //Pages
       if (mModel.pages != null) {
         await removeKey(PAGES);
+        appStore.mPageList.clear();
         mModel.pages.forEachIndexed((element, index) {
           if (element.status == "1") {
             appStore.addToPageList(element);

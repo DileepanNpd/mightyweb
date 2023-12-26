@@ -1,10 +1,10 @@
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import '../Network/NetworkUtils.dart';
 import '../app_localizations.dart';
 import '../component/DeepLinkWidget.dart';
 import '../main.dart';
 import '../model/MainResponse.dart';
+import '../network/NetworkUtils.dart';
 import '../screen/DashboardScreen.dart';
 import '../screen/ErrorScreen.dart';
 import '../screen/SplashScreen.dart';
@@ -21,12 +21,9 @@ class DataScreen extends StatefulWidget {
   DataScreenState createState() => DataScreenState();
 }
 
-class DataScreenState extends State<DataScreen> with AfterLayoutMixin<DataScreen> {
+class DataScreenState extends State<DataScreen> {
   bool isWasConnectionLoss = false;
   AsyncMemoizer<MainResponse> mainMemoizer = AsyncMemoizer<MainResponse>();
-
-  @override
-  void afterFirstLayout(BuildContext context) {}
 
   @override
   void setState(fn) {

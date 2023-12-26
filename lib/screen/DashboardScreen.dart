@@ -25,7 +25,7 @@ class DashBoardScreen extends StatefulWidget {
 }
 
 class DashBoardScreenState extends State<DashBoardScreen> {
-  late List<MenuStyleModel> mBottomMenuList;
+  List<MenuStyleModel> mBottomMenuList=[];
   List<Widget> widgets = [];
 
   @override
@@ -50,7 +50,7 @@ class DashBoardScreenState extends State<DashBoardScreen> {
       Iterable mBottom = jsonDecode(getStringAsync(MENU_STYLE));
       mBottomMenuList = mBottom.map((model) => MenuStyleModel.fromJson(model)).toList();
 
-      if (mBottomMenuList.isNotEmpty && mBottomMenuList != null) {
+      if (mBottomMenuList.isNotEmpty) {
         for (int i = 0; i < mBottomMenuList.length; i++) {
           widgets.add(HomeScreen(mUrl: mBottomMenuList[i].url));
         }
@@ -60,7 +60,7 @@ class DashBoardScreenState extends State<DashBoardScreen> {
     } else {
       Iterable mBottom = jsonDecode(getStringAsync(BOTTOMMENU));
       mBottomMenuList = mBottom.map((model) => MenuStyleModel.fromJson(model)).toList();
-      if (getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION && mBottomMenuList.isNotEmpty && mBottomMenuList != null) {
+      if (getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION && mBottomMenuList.isNotEmpty) {
         for (int i = 0; i < appStore.mBottomNavigationList.length; i++) {
           widgets.add(HomeScreen(mUrl: mBottomMenuList[i].url));
         }
@@ -104,7 +104,7 @@ class DashBoardScreenState extends State<DashBoardScreen> {
   @override
   Widget build(BuildContext context) {
     return getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION_SIDE_DRAWER ||
-            getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION && mBottomMenuList.isNotEmpty && mBottomMenuList != null
+            getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION && mBottomMenuList.isNotEmpty
         ? Scaffold(
             backgroundColor: context.scaffoldBackgroundColor,
             bottomNavigationBar: getStringAsync(ADD_TYPE) != NONE

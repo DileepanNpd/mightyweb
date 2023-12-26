@@ -39,7 +39,6 @@ class CustomTheme extends StatelessWidget {
     return Theme(
       data: appStore.isDarkModeOn!
           ? ThemeData.dark().copyWith(
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               colorScheme: ColorScheme.fromSwatch().copyWith(secondary: appStore.primaryColors),
             )
           : ThemeData.light(),
@@ -53,6 +52,7 @@ String? getReferralCodeFromNative() {
 
   if (isMobile) {
     var referralCode = platform.invokeMethod('mightyweb/events');
+    print("=============================object$referralCode=======================");
     return referralCode.toString();
   } else {
     return '';
@@ -146,7 +146,7 @@ Widget showBannerAds() {
   return getStringAsync(ADD_TYPE) != NONE
       ? getStringAsync(ADD_TYPE) == isGoogleAds
           ? Container(
-              height:  60,
+              height: 60,
               child: AdWidget(
                 ad: BannerAd(
                   adUnitId: kReleaseMode

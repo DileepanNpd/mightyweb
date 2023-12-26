@@ -22,8 +22,8 @@ class AppBarComponent extends StatefulWidget {
 }
 
 class AppBarComponentState extends State<AppBarComponent> {
-  late List<Righticon> mRightIconList = [];
-  late List<Lefticon> mLeftIconList = [];
+  List<Righticon> mRightIconList = [];
+  List<Lefticon> mLeftIconList = [];
 
   @override
   void initState() {
@@ -90,15 +90,19 @@ class AppBarComponentState extends State<AppBarComponent> {
     }
   }
 
+  double leadingWidthWidget() {
+    if (getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_TAB_BAR || getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION) {
+      return 16;
+    } else {
+      return 50;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: appStore.primaryColors,
-      leadingWidth: getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_TAB_BAR ||
-              getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION &&
-              getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_SIDE_DRAWER_TABS
-          ? 16
-          : 50,
+      leadingWidth: leadingWidthWidget(),
       centerTitle: getStringAsync(HEADERSTYLE) == HEADER_STYLE_CENTER ? true : false,
       title: getStringAsync(HEADERSTYLE) == HEADER_STYLE_EMPTY ? Text("") : Text(getStringAsync(APPNAME), style: boldTextStyle(color: white, size: 18)),
       flexibleSpace: Container(
@@ -120,7 +124,7 @@ class AppBarComponentState extends State<AppBarComponent> {
           ? PreferredSize(preferredSize: Size.fromHeight(20.0), child: TabBarComponent())
           : PreferredSize(preferredSize: Size.fromHeight(0.0), child: SizedBox()),
       actions: [
-        mRightIconList.isNotEmpty && mRightIconList != null
+        mRightIconList.isNotEmpty
             ? ListView.builder(
                 itemCount: mRightIconList.length,
                 scrollDirection: Axis.horizontal,

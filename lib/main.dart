@@ -6,7 +6,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../AppTheme.dart';
-import '../Store/AppStore.dart';
 import '../app_localizations.dart';
 import '../model/LanguageModel.dart';
 import '../screen/DataScreen.dart';
@@ -15,6 +14,7 @@ import '../utils/constant.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'component/NoInternetConnection.dart';
+import 'store/AppStore.dart';
 
 AppStore appStore = AppStore();
 

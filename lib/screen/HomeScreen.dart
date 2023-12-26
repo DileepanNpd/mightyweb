@@ -43,7 +43,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   ReceivePort port = ReceivePort();
   PullToRefreshController? pullToRefreshController;
 
-  late List<TabsResponse> mTabList;
+  List<TabsResponse> mTabList=[];
+  List<MenuStyleModel> mBottomMenuList = [];
 
   String? mInitialUrl;
 
@@ -75,17 +76,23 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    FacebookAudienceNetwork.init(
-      testingId: FACEBOOK_KEY,
-      iOSAdvertiserTrackingEnabled: true,
-    );
+    FacebookAudienceNetwork.init(testingId: FACEBOOK_KEY, iOSAdvertiserTrackingEnabled: true);
     Iterable mTabs = jsonDecode(getStringAsync(TABS));
     mTabList = mTabs.map((model) => TabsResponse.fromJson(model)).toList();
     _getInstanceId();
     if (getStringAsync(IS_WEBRTC) == "true") {
       checkWebRTCPermission();
     }
-
+    pullToRefreshController = PullToRefreshController(
+      options: PullToRefreshOptions(color: appStore.primaryColors, enabled: getStringAsync(IS_PULL_TO_REFRESH) == "true" ? true : false),
+      onRefresh: () async {
+        if (Platform.isAndroid) {
+          webViewController?.reload();
+        } else if (Platform.isIOS) {
+          webViewController?.loadUrl(urlRequest: URLRequest(url: await webViewController?.getUrl()));
+        }
+      },
+    );
     init();
     loadInterstitialAds();
   }
@@ -116,18 +123,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Future<void> init() async {
-    if (Platform.isIOS) {
-      String? referralCode = getReferralCodeFromNative();
-      if (referralCode!.isNotEmpty) {
-        mInitialUrl = referralCode;
-      }
-    } else {
-      if (!appStore.deepLinkURL.isEmptyOrNull) {
-        mInitialUrl = appStore.deepLinkURL!;
-      }
+    String? referralCode = getReferralCodeFromNative();
+    if (referralCode!.isNotEmpty) {
+      mInitialUrl = referralCode;
     }
-
-    List<MenuStyleModel> mBottomMenuList = [];
 
     if (getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION_SIDE_DRAWER) {
       Iterable mBottom = jsonDecode(getStringAsync(MENU_STYLE));
@@ -137,14 +136,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       mBottomMenuList = mBottom.map((model) => MenuStyleModel.fromJson(model)).toList();
     }
     if (getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION || getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION_SIDE_DRAWER) {
-      if (mBottomMenuList != null && mBottomMenuList.isNotEmpty) {
+      if (mBottomMenuList.isNotEmpty) {
         mInitialUrl = widget.mUrl;
       } else {
         mInitialUrl = getStringAsync(URL);
       }
     } else if (getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_TAB_BAR || getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_SIDE_DRAWER_TABS) {
       log(widget.mUrl);
-      if (mTabList.isNotEmpty && mTabList != null) {
+      if (mTabList.isNotEmpty) {
         mInitialUrl = widget.mUrl;
         log(mInitialUrl);
       } else {
@@ -160,16 +159,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       log("sorry");
     }
 
-    pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(color: appStore.primaryColors, enabled: getStringAsync(IS_PULL_TO_REFRESH) == "true" ? true : false),
-      onRefresh: () async {
-        if (Platform.isAndroid) {
-          webViewController?.reload();
-        } else if (Platform.isIOS) {
-          webViewController?.loadUrl(urlRequest: URLRequest(url: await webViewController?.getUrl()));
-        }
-      },
-    );
+
   }
 
   @override
@@ -218,8 +208,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       if (getStringAsync(IS_LOADER) == "true") appStore.setLoading(true);
                       setState(() {});
                     },
+                    onProgressChanged: (controller, progress) {
+                      if (progress == 100) {
+                        pullToRefreshController!.endRefreshing();
+                        if (getStringAsync(IS_LOADER) == "true") appStore.setLoading(false);
+                        setState(() {});
+                      }
+                    },
                     onLoadStop: (controller, url) async {
                       log("onLoadStop");
+                      pullToRefreshController!.endRefreshing();
                       if (getStringAsync(IS_LOADER) == "true") appStore.setLoading(false);
                       //webViewController!.evaluateJavascript(source: 'document.getElementsByClassName("navbar-main")[0].style.display="none";');
                       if (getStringAsync(DISABLE_HEADER) == "true") {
@@ -234,7 +232,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             .then((value) => debugPrint('Page finished loading Javascript'))
                             .catchError((onError) => debugPrint('$onError'));
                       }
-                      pullToRefreshController!.endRefreshing();
                       setState(() {});
                     },
                     onLoadError: (controller, url, code, message) {
@@ -252,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         if (url.contains("maps")) {
                           var mNewURL = url.replaceAll("intent://", "https://");
                           if (await canLaunchUrl(Uri.parse(mNewURL))) {
-                            await launchUrl(Uri.parse(mNewURL));
+                            await launchUrl(Uri.parse(mNewURL),mode:LaunchMode.externalApplication);
                             return NavigationActionPolicy.CANCEL;
                           }
                         } else {
@@ -301,8 +298,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       }
                       return NavigationActionPolicy.ALLOW;
                     },
-                    onDownloadStart: (controller, url) {
-                      launchUrl(Uri.parse(url.toString()), mode: LaunchMode.externalApplication);
+                    onDownloadStartRequest: (controller, downloadStartRequest) {
+                      launchUrl(Uri.parse(downloadStartRequest.url.toString()), mode: LaunchMode.externalApplication);
                     },
                     androidOnGeolocationPermissionsShowPrompt: (InAppWebViewController controller, String origin) async {
                       await Permission.location.request();
@@ -324,7 +321,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     }).visible(isWasConnectionLoss == false);
               }),
           //NoInternetConnection().visible(isWasConnectionLoss == true),
-          Loaders(name: appStore.loaderValues).center().visible(appStore.isLoading)
+          // Loaders(name: appStore.loaderValues).center().visible(appStore.isLoading)
+          Container(color: Colors.white, height: context.height(), width: context.width(), child: Loaders(name: appStore.loaderValues).center()).visible(appStore.isLoading)
+
+
         ],
       );
     }
@@ -332,10 +332,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     Widget mBody() {
       return Padding(
         padding: EdgeInsets.only(
-            top: getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_FULL_SCREEN || getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION ? context.statusBarHeight : 0),
+            top: getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_FULL_SCREEN ? context.statusBarHeight : 0),
         child: Scaffold(
           drawerEdgeDragWidth: 0,
-          appBar: getStringAsync(NAVIGATIONSTYLE) != NAVIGATION_STYLE_FULL_SCREEN && getStringAsync(NAVIGATIONSTYLE) != NAVIGATION_STYLE_BOTTOM_NAVIGATION
+          appBar: getStringAsync(NAVIGATIONSTYLE) != NAVIGATION_STYLE_FULL_SCREEN
               ? PreferredSize(
                   child: AppBarComponent(
                     onTap: (value) {
@@ -369,7 +369,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   preferredSize: Size.fromHeight(
                       getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_TAB_BAR || getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_SIDE_DRAWER_TABS && appStore.mTabList.length != 0
                           ? 100.0
-                          : 60.0))
+                          : 60.0),
+                )
               : PreferredSize(
                   child: SizedBox(),
                   preferredSize: Size.fromHeight(0.0),
@@ -383,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ).visible(getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_SIDE_DRAWER ||
               getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_BOTTOM_NAVIGATION_SIDE_DRAWER ||
               getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_SIDE_DRAWER_TABS),
-          body: getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_TAB_BAR || getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_SIDE_DRAWER_TABS && mTabList != null && appStore.mTabList.length != 0
+          body: getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_TAB_BAR || getStringAsync(NAVIGATIONSTYLE) == NAVIGATION_STYLE_SIDE_DRAWER_TABS && appStore.mTabList.length != 0
               ? TabBarView(
                   physics: NeverScrollableScrollPhysics(),
                   children: [

@@ -42,7 +42,7 @@ class AboutUsScreenState extends State<AboutUsScreen> {
         return true;
       },
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: context.scaffoldBackgroundColor,
         appBar: AppBar(
           backgroundColor: appStore.primaryColors,
           flexibleSpace: Container(

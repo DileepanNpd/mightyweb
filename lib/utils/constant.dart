@@ -6,20 +6,20 @@ const PURCHASE_CODE = '';
 const BASE_URL_OFFLINE = 'https://meetmighty.com/mightyweb-public/view/getjson.php?user=$PURCHASE_CODE';
 
 //preference
-const mOneSignalID = 'ADD YOUR ONE SIGNAL APP ID';
+const mOneSignalID = 'YOUR_ONESIGNAL_ID';
 
 //AdmobId
-const adMobBannerId = "ADD YOUR ADMOB BANNER ID";
-const adMobInterstitialId = "ADD YOUR ADMOB INTERTITIAL ID";
-const adMobBannerIdIos = "ADD YOUR ADMOB IOS BANNER ID";
-const adMobInterstitialIdIos = "ADD YOUR ADMOB INTERTITIAL ID";
+const adMobBannerId = "YOUR_ADMOB_BANNER_ID";
+const adMobInterstitialId = "YOUR_INTERSTITIAL_ID";
+const adMobBannerIdIos = "YOUR_ADMOB_BANNER_ID_IOS";
+const adMobInterstitialIdIos = "YOUR_INTERSTITIAL_ID_IOS";
 
 // Facebook
-const FACEBOOK_KEY = 'ADD YOUR FACEBOOK ID';
-const fbBannerId = "ADD YOUR FACEBOOK BANNER PLACEMENT ID";
-const fbBannerIdIos = "ADD YOUR FACEBOOK IOS BANNER PLACEMENT ID";
-const fbInterstitialId = "ADD YOUR FACEBOOK INTERTITIAL PLACEMNET ID";
-const fbInterstitialIdIos = "ADD YOUR FACEBOOK IOS INTERTITIAL PLACEMNET ID";
+const FACEBOOK_KEY = 'YOUR_FACEBOOK_KEY';
+const fbBannerId = "IMG_16_9_APP_INSTALL#2312433698835503_2964944860251047";
+const fbBannerIdIos = "";
+const fbInterstitialId = "IMG_16_9_APP_INSTALL#549167759165615_549190905829967";
+const fbInterstitialIdIos = "";
 
 const APPNAME = 'appName';
 const APPLOGO = 'appLogo';

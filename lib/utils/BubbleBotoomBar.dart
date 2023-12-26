@@ -432,5 +432,5 @@ class _BubbleBottomBarClipper extends CustomClipper<Path> {
 
 BubbleBottomBarItem tab(String iconData, String tabName,BuildContext context) {
   return BubbleBottomBarItem(
-      backgroundColor: appStore.primaryColors, icon: cachedImage(iconData,height: 24, width: 24, color: Theme.of(context).textTheme.subtitle1!.color), activeIcon: cachedImage(iconData, height: 24, width: 24,color: appStore.primaryColors), title: Text(tabName, style: primaryTextStyle(color: appStore.primaryColors)));
+      backgroundColor: appStore.primaryColors, icon: cachedImage(iconData,height: 24, width: 24, color: textSecondaryColor), activeIcon: cachedImage(iconData, height: 24, width: 24,color: appStore.primaryColors), title: Text(tabName, style: primaryTextStyle(color: appStore.primaryColors)));
 }

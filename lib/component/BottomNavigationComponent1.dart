@@ -54,9 +54,9 @@ class BottomNavigationComponent1State extends State<BottomNavigationComponent1> 
             selectedLabelStyle: secondaryTextStyle(color: textPrimaryColorGlobal),
             selectedItemColor: appStore.primaryColors,
             items: [
-              for (int i = 0; i < appStore.mBottomNavigationList.length; i++)
+              for (int i = 0; i < mBottomMenuList!.length; i++)
                 BottomNavigationBarItem(
-                  icon: cachedImage(mBottomMenuList![i].image, width: 20, height: 20, color: Theme.of(context).textTheme.subtitle1!.color),
+                  icon: cachedImage(mBottomMenuList![i].image, width: 20, height: 20, color: textSecondaryColor),
                   activeIcon: cachedImage(mBottomMenuList![i].image, width: 20, height: 20, color: appStore.primaryColors),
                   label: mBottomMenuList![i].title.toString(),
                   backgroundColor:context.scaffoldBackgroundColor

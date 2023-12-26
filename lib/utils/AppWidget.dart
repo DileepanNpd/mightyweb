@@ -8,6 +8,8 @@ import '../utils/constant.dart';
 import '../utils/images.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import 'colors.dart';
+
 Widget cachedImage(String? url, {double? height, Color? color, double? width, BoxFit? fit, AlignmentGeometry? alignment, bool usePlaceholderIfUrlEmpty = true, double? radius}) {
   if (url.validate().isEmpty) {
     return placeHolderWidget(height: height, width: width, fit: fit, alignment: alignment, radius: radius);
@@ -151,14 +153,65 @@ Widget setLeftIcon(Lefticon mLeftIconModel) {
 }
 
 bool mConfirmationDialog(Function onTap, BuildContext context, AppLocalizations? appLocalization) {
-  showConfirmDialogCustom(context,
-      dialogType: DialogType.CONFIRMATION,
-      primaryColor: appStore.primaryColors,
-      negativeText: getStringAsync(EXIST_NEGATIVE_TEXT, defaultValue: appLocalization!.translate('lbl_no')!),
-      positiveText: getStringAsync(EXIST_POSITIVE_TEXT, defaultValue: appLocalization.translate('lbl_yes')!),
-      customCenterWidget: getStringAsync(EXIST_ENABLE_ICON) == "true" ? Image.network(getStringAsync(EXIST_ICON), fit: BoxFit.contain, height: 80, width: 80).paddingOnly(top: 16) : SizedBox(),
-      title: getStringAsync(EXIST_TITLE, defaultValue: appLocalization.translate('lbl_logout')!), onAccept: (c) {
-    exit(0);
-  });
+  showDialog(
+    context: getContext,
+    builder: (p0) {
+      return AlertDialog(
+        backgroundColor: !appStore.isDarkModeOn.validate() ? Colors.white : darkCardColor,
+        actions: [
+          Row(
+            children: [
+              AppButton(
+                elevation: 0,
+                shapeBorder: RoundedRectangleBorder(borderRadius: radius(defaultAppButtonRadius), side: BorderSide(color: viewLineColor)),
+                color: !appStore.isDarkModeOn.validate() ? Colors.white : darkCardColor,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.close, color: textPrimaryColorGlobal, size: 20),
+                    6.width,
+                    Text(
+                      getStringAsync(EXIST_NEGATIVE_TEXT, defaultValue: appLocalization!.translate('lbl_no')!),
+                      style: boldTextStyle(color: textPrimaryColorGlobal),
+                    ),
+                  ],
+                ).fit(),
+                onTap: () {
+                  finish(context);
+                },
+              ).expand(),
+              16.width,
+              AppButton(
+                elevation: 0,
+                color: appStore.primaryColors,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check, color: Colors.white, size: 20),
+                    6.width,
+                    Text(
+                      getStringAsync(EXIST_POSITIVE_TEXT, defaultValue: appLocalization.translate('lbl_yes')!),
+                      style: boldTextStyle(color: Colors.white),
+                    ),
+                  ],
+                ).fit(),
+                onTap: () {
+                  exit(0);
+                },
+              ).expand(),
+            ],
+          ).paddingSymmetric(vertical: 8, horizontal: 16),
+        ],
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            getStringAsync(EXIST_ENABLE_ICON) == "true" ? Image.network(getStringAsync(EXIST_ICON), fit: BoxFit.contain, height: 80, width: 80).paddingOnly(top: 16) : SizedBox(),
+            20.height,
+            Text(getStringAsync(EXIST_TITLE, defaultValue: appLocalization.translate('lbl_logout')!), style: primaryTextStyle(size: 16), textAlign: TextAlign.center),
+          ],
+        ),
+      );
+    },
+  );
   return true;
 }

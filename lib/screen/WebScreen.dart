@@ -136,7 +136,7 @@ class WebScreenState extends State<WebScreen> {
     return WillPopScope(
       onWillPop: _exitApp,
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        // backgroundColor: context.scaffoldBackgroundColor,
         appBar: AppBar(
           backgroundColor: appStore.primaryColors,
           flexibleSpace: Container(
@@ -175,17 +175,23 @@ class WebScreenState extends State<WebScreen> {
                 if (getStringAsync(IS_LOADER) == "true") appStore.setLoading(true);
                 setState(() {});
               },
+              onProgressChanged: (controller, progress) {
+                if (progress == 100) {
+                  pullToRefreshController!.endRefreshing();
+                  if (getStringAsync(IS_LOADER) == "true") appStore.setLoading(false);
+                  setState(() {});
+                }
+              },
               onLoadStop: (controller, url) async {
                 log("onLoadStop");
                 if (getStringAsync(IS_LOADER) == "true") appStore.setLoading(false);
                 if (getStringAsync(DISABLE_HEADER) == "true") {
-                  webViewController!.evaluateJavascript(source: 'document.getElementsByClassName("Header_scrolling__3khE2")[0].style.display="none";');
-
-                  // webViewController!
-                  //     .evaluateJavascript(source: "javascript:(function() { " + "var head = document.getElementsByTagName('header')[0];" + "head.parentNode.removeChild(head);" + "})()")
-                  //     .then((value) => debugPrint('Page finished loading Javascript'))
-                  //     .catchError((onError) => debugPrint('$onError'));
+                  webViewController!
+                      .evaluateJavascript(source: "javascript:(function() { " + "var head = document.getElementsByTagName('header')[0];" + "head.parentNode.removeChild(head);" + "})()")
+                      .then((value) => debugPrint('Page finished loading Javascript'))
+                      .catchError((onError) => debugPrint('$onError'));
                 }
+
                 if (getStringAsync(DISABLE_FOOTER) == "true") {
                   webViewController!
                       .evaluateJavascript(source: "javascript:(function() { " + "var footer = document.getElementsByTagName('footer')[0];" + "footer.parentNode.removeChild(footer);" + "})()")
@@ -257,8 +263,8 @@ class WebScreenState extends State<WebScreen> {
                 }
                 return NavigationActionPolicy.ALLOW;
               },
-              onDownloadStart: (controller, url) {
-                launchUrl(Uri.parse(url.toString()), mode: LaunchMode.externalApplication);
+              onDownloadStartRequest: (controller, downloadStartRequest) {
+                launchUrl(Uri.parse(downloadStartRequest.url.toString()), mode: LaunchMode.externalApplication);
               },
               androidOnGeolocationPermissionsShowPrompt: (InAppWebViewController controller, String origin) async {
                 await Permission.location.request();

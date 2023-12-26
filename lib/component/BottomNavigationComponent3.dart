@@ -59,7 +59,7 @@ class BottomNavigationComponent3State extends State<BottomNavigationComponent3> 
           icon,
           width: 20,
           height: 20,
-          color: currentIndex == pos ? appStore.primaryColors : Theme.of(context).textTheme.subtitle1!.color,
+          color: currentIndex == pos ? appStore.primaryColors : textSecondaryColor,
         ),
       ),
     );
